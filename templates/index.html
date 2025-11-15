@@ -1,1 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🚗 Driver Drowsiness Detection System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
 
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">🚗 Driver Drowsiness Detection System</h1>
+      <h2 id="status">Calibrating... please look at camera</h2>
+    </div>
+
+    <div class="video-container">
+      <img id="video-stream" src="{{ url_for('video') }}" alt="Video Stream" />
+    </div>
+  </div>
+
+  <script>
+    const statusEl = document.getElementById('status');
+
+    async function updateStatus() {
+      try {
+        const res = await fetch('/label');
+        const data = await res.json();
+        const label = data.label || "No data";
+
+        if (label.includes("Active")) statusEl.style.color = "#00FF66";
+        else if (label.includes("Yawning")) statusEl.style.color = "#FFA500";
+        else if (label.includes("Drowsy")) statusEl.style.color = "#FF3333";
+        else statusEl.style.color = "#FFFFFF";
+
+        statusEl.textContent = label;
+      } catch {
+        statusEl.textContent = "Connection Lost...";
+        statusEl.style.color = "gray";
+      }
+    }
+
+    setInterval(updateStatus, 500);
+  </script>
+</body>
+</html>
